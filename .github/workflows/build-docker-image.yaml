@@ -1,3 +1,10 @@
+name: Build docker image & push to AWS ECR
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
