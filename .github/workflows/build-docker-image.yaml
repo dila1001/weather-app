@@ -15,7 +15,7 @@ jobs:
           access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           account_id: ${{ secrets.AWS_ACCOUNT_ID }}
-          repo: public.ecr.aws/d2v7z0q4/weather-app
+          repo: d2v7z0q4/weather-app
           region: eu-north-1
           tags: latest,${{ github.sha }}
           create_repo: true
