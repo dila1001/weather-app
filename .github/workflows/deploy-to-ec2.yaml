@@ -5,7 +5,7 @@ on:
     workflows: ['Build docker image & push to AWS ECR']
     types:
       - completed
-
+  workflow_dispatch:
 jobs:
   deploy:
     name: Deploy to EC2
