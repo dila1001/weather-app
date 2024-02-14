@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: weather-app
+  annotations:
+    github.com/project-slug: dila1001/weather-app
+spec:
+  type: other
+  lifecycle: unknown
+  owner: guests

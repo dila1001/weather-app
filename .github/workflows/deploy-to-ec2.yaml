@@ -1,0 +1,42 @@
+name: Deploy to EC2
+
+on:
+  workflow_run:
+    workflows: ['Build docker image & push to AWS ECR']
+    types:
+      - completed
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Get ECR_REGISTRY
+        id: ecr
+        run: |
+          ECR_REGISTRY=$(aws ecr describe-repositories --repository-names weather-app --region eu-north-1 --query 'repositories[0].repositoryUri' --output text)
+          echo "ECR_REGISTRY=${ECR_REGISTRY}" >> $GITHUB_ENV
+
+      - name: SSH into EC2 Instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            docker login -u AWS -p $(aws ecr get-login-password --region eu-north-1) $ECR_REGISTRY
+            docker pull $ECR_REGISTRY/weather-app:latest
+            docker stop weather-app-container || true
+            docker rm weather-app-container || true
+            docker run -d -p 80:80 --name weather-app-container $ECR_REGISTRY/weather-app:latest
